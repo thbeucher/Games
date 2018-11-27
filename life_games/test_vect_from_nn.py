@@ -84,5 +84,9 @@ if __name__ == '__main__':
   predicter_layer = tf.layers.Dense(2, activation=None)
   layers = [learner_layer, predicter_layer]
 
-  # train(x, targets, layers)
-  test(x, targets, layers)
+  rep = input('Launch train? (y or n): ')
+  if rep == 'y' or rep == '':
+    train(x, targets, layers)
+  rep = input('Launch test? (y or n): ')
+  if rep == 'y' or rep == '':
+    test(x, targets, layers)

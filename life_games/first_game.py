@@ -1,5 +1,6 @@
+import utils as u
 import pygame as pg
-from drawing import Circle
+from shelter import Circle
 import tensorflow.contrib.eager as tfe
 
 
@@ -10,11 +11,16 @@ colors = {'red': (255,0,0), 'green': (0,255,0), 'blue': (0,0,255), 'darkBlue': (
           'white': (255,255,255), 'black': (0,0,0), 'pink': (255,200,200)}
 
 pg.init()
-win_size = (400, 400)
+win_size = (100, 100)
 
 screen = pg.display.set_mode(win_size)
 screen.fill(colors['white'])
-c = Circle((100, 100))
+c = Circle((50, 50))
+
+ar = pg.surfarray.array2d(screen)
+print(ar)
+print(ar.shape)
+u.matprint(ar[39:61:1, 39:61:1])
 
 
 while 1:
