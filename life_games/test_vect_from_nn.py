@@ -30,14 +30,14 @@ def validation(x, y, layers, dump=False):
   return (False, loss) if loss == 0 else (True, loss)
 
 
-def launch_train(layers):
+def launch_train(x, targets, layers):
   optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
   running = True
   epoch = 0
   while running:
     for i, el in enumerate(x):
-      optimizer.minimize(lambda: get_loss(el, target[i], layers))
-    running, loss = validation(x, target, layers)
+      optimizer.minimize(lambda: get_loss(el, targets[i], layers))
+    running, loss = validation(x, targets, layers)
     if epoch % 100 == 0:
       print('epoch {} | loss = {}'.format(epoch, loss))
     if tf.equal(loss, 0.):
@@ -45,18 +45,31 @@ def launch_train(layers):
     epoch += 1
 
 
-def init_layers():
-  pass
+def init_layers(layers):
+  forward(tf.zeros((1, 2), dtype=tf.float32), layers)
 
 
 def save(to_save, save_path='models/arrow_direction/'):
-  saver = tfe.Saver([t for var in self.to_save for t in var.variables])
+  saver = tfe.Saver([t for var in to_save for t in var.variables])
   saver.save(save_path)
 
 
 def load(to_load, save_path='models/arrow_direction/'):
-  saver = tfe.Saver([t for var in self.to_load for t in var.variables])
+  init_layers(to_load)
+  saver = tfe.Saver([t for var in to_load for t in var.variables])
   saver.restore(save_path)
+
+
+def train(x, targets, layers):
+  launch_train(x, targets, layers)
+  validation(x, targets, layers, dump=True)
+  save(layers)
+
+
+def test(x, targets, layers):
+  load(layers)
+  validation(x, targets, layers, dump=True)
+
 
 
 if __name__ == '__main__':
@@ -64,13 +77,12 @@ if __name__ == '__main__':
 
   x = [np.array([[0], [100]]), np.array([[100], [0]]), np.array([[200], [100]]), np.array([[100], [200]])]
   x = [tf.convert_to_tensor(el.reshape((1, 2)), tf.float32) for el in x]
-  target = [np.array([[0], [5]]).T, np.array([[90], [5]]).T, np.array([[180], [5]]).T, np.array([[270], [5]]).T]
+  targets = [np.array([[0], [5]]).T, np.array([[90], [5]]).T, np.array([[180], [5]]).T, np.array([[270], [5]]).T]
 
 
   learner_layer = tf.layers.Dense(10, activation=tf.nn.relu)
   predicter_layer = tf.layers.Dense(2, activation=None)
   layers = [learner_layer, predicter_layer]
 
-  launch_train(layers)
-
-  validation(x, target, layers, dump=True)
+  # train(x, targets, layers)
+  test(x, targets, layers)
