@@ -45,8 +45,8 @@ def launch_train(x, targets, layers):
     epoch += 1
 
 
-def init_layers(layers):
-  forward(tf.zeros((1, 2), dtype=tf.float32), layers)
+def init_layers(layers, inp=tf.zeros((1, 2), dtype=tf.float32)):
+  forward(inp, layers)
 
 
 def save(to_save, save_path='models/arrow_direction/'):
