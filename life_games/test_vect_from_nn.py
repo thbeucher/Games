@@ -1,3 +1,5 @@
+import sys
+import logging
 import numpy as np
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
@@ -26,7 +28,7 @@ def validation(x, y, layers, dump=False):
   output = tf.math.round(output)
   loss = tf.losses.mean_squared_error(y, output)
   if dump:
-    print('output -> {}\ntarget -> {}'.format(output, y))
+    logging.info('output -> {}\ntarget -> {}'.format(output, y))
   return (False, loss) if loss == 0 else (True, loss)
 
 
@@ -39,10 +41,11 @@ def launch_train(x, targets, layers):
       optimizer.minimize(lambda: get_loss(el, targets[i], layers))
     running, loss = validation(x, targets, layers)
     if epoch % 100 == 0:
-      print('epoch {} | loss = {}'.format(epoch, loss))
+      logging.info('epoch {} | loss = {}'.format(epoch, loss))
     if tf.equal(loss, 0.):
       running = False
     epoch += 1
+  return epoch
 
 
 def init_layers(layers, inp=tf.zeros((1, 2), dtype=tf.float32)):
@@ -61,7 +64,8 @@ def load(to_load, save_path='models/arrow_direction/'):
 
 
 def train(x, targets, layers):
-  launch_train(x, targets, layers)
+  epoch = launch_train(x, targets, layers)
+  logging.info('Training ended in {} epochs'.format(epoch))
   validation(x, targets, layers, dump=True)
   save(layers)
 
@@ -73,6 +77,8 @@ def test(x, targets, layers):
 
 
 if __name__ == '__main__':
+  logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
   moves = {'right': np.array([0, 5]), 'down': np.array([90, 5]), 'left': np.array([180, 5]), 'up': np.array([270, 5])}
 
   x = [np.array([[0], [100]]), np.array([[100], [0]]), np.array([[200], [100]]), np.array([[100], [200]])]

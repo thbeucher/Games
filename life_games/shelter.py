@@ -26,10 +26,7 @@ class Circle:
     self.rect = pg.draw.circle(self.surface, self.color, pos, self.size)
 
   def move(self, vector, list_obj_for_colision=[]):
-    angle, speed = vector
-    rad_angle = angle * math.pi / 180
-    dx = speed * math.cos(rad_angle)
-    dy = speed * math.sin(rad_angle)
+    dx, dy = u.move_from_vector(vector)
     new_rect = self.rect.move(dx, dy)
     other_obj = [obj for obj in list_obj_for_colision if obj is not self]
     idx_collide = new_rect.collidelist([obj.rect for obj in other_obj])
@@ -48,3 +45,18 @@ class Circle:
     self.size -= self.loose_size
     if self.size <= 0:
       self.alive = False
+
+
+class Rectangle:
+  def __init__(self, init_pos, color=COLORS['black'], width=1):
+    self.color = color
+    self.width = width
+    self.surface = pg.display.get_surface()
+    self.rect = pg.draw.rect(self.surface, color, init_pos, width)
+
+  def draw(self):
+    self.rect = pg.draw.rect(self.surface, self.color, self.rect, self.width)
+
+  def move(self, vector, list_obj_for_colision=[]):
+    dx, dy = u.move_from_vector(vector)
+    self.rect = self.rect.move(dx, dy)

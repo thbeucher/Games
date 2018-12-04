@@ -1,6 +1,6 @@
 import utils as u
 import pygame as pg
-from shelter import Circle
+from shelter import Circle, Rectangle
 # import tensorflow.contrib.eager as tfe
 
 
@@ -18,14 +18,17 @@ screen.fill(colors['white'])
 c = Circle((50, 50))
 
 food1 = Circle((100, 100))
-list_objs = [c, food1]
+target_rect = Rectangle((food1.rect.x, food1.rect.y, 20, 20), color=colors['green'])
+moving_rect = Rectangle((150, 150, 20, 20), color=colors['red'])
+subject_to_predation = [c, food1]
+other_objs = [target_rect, moving_rect]
 
 # ar = pg.surfarray.array2d(screen)
 # print(ar)
 # print(ar.shape)
 # u.matprint(ar[39:61:1, 39:61:1])
 
-
+obj_to_move = moving_rect
 while 1:
   for e in pg.event.get():
     if e.type == pg.KEYDOWN:
@@ -33,19 +36,21 @@ while 1:
         pg.quit()
         quit()
       if e.key == pg.K_UP:
-        c.move((270, 5), list_obj_for_colision=list_objs)
+        obj_to_move.move((270, 5), list_obj_for_colision=list_objs)
       if e.key == pg.K_DOWN:
-        c.move((90, 5), list_obj_for_colision=list_objs)
+        obj_to_move.move((90, 5), list_obj_for_colision=list_objs)
       if e.key == pg.K_LEFT:
-        c.move((180, 5), list_obj_for_colision=list_objs)
+        obj_to_move.move((180, 5), list_obj_for_colision=list_objs)
       if e.key == pg.K_RIGHT:
-        c.move((0, 5), list_obj_for_colision=list_objs)
+        obj_to_move.move((0, 5), list_obj_for_colision=list_objs)
+      if e.key in [pg.K_UP, pg.K_DOWN, pg.K_LEFT, pg.K_RIGHT]:
+        print(u.box_l2_loss(moving_rect, target_rect))
     if e.type == pg.QUIT:
       pg.quit()
       quit()
 
   screen.fill(colors['white'])
-  u.predation(list_objs)
-  list_objs = u.remove_corps(list_objs)
-  u.draw_obj(list_objs)
+  u.predation(subject_to_predation)
+  list_objs = u.remove_corps(subject_to_predation)
+  u.draw_obj(subject_to_predation + other_objs)
   pg.display.flip()

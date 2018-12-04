@@ -1,4 +1,20 @@
+import math
+import numpy as np
 import pygame as pg
+
+
+def box_l2_loss(obj1, obj2):
+  r1 = np.array([obj1.rect.x, obj1.rect.y, obj1.rect.width, obj1.rect.height])
+  r2 = np.array([obj2.rect.x, obj2.rect.y, obj2.rect.width, obj2.rect.height])
+  return np.linalg.norm(r1 - r2)
+
+
+def move_from_vector(vector):
+  angle, speed = vector
+  rad_angle = angle * math.pi / 180
+  dx = speed * math.cos(rad_angle)
+  dy = speed * math.sin(rad_angle)
+  return dx, dy
 
 
 def draw_obj(list_obj):
